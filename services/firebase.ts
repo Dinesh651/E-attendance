@@ -1,6 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getDatabase, ref, get, query, orderByChild, equalTo, set, push, remove, child } from "firebase/database";
+// Fix: Use Firebase v8 compat imports to work with the v12 library via import map.
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
 import { User, Role } from "../types";
 
 
@@ -17,42 +18,51 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-export const db = getDatabase(app);
+// Fix: Use Firebase v8 compat syntax and prevent re-initialization.
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+export const auth = firebase.auth();
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+export const db = firebase.database();
 
 
 export const findUserByEmailInDB = async (email: string): Promise<User | null> => {
-  const dbRef = ref(db);
+  // Fix: Use Firebase v8 compat syntax.
+  const dbRef = db.ref();
   const normalizedEmail = email.toLowerCase();
 
-  // Check admins
-  const adminQuery = query(child(dbRef, 'admins'), orderByChild('email'), equalTo(normalizedEmail));
-  const adminSnapshot = await get(adminQuery);
-  if (adminSnapshot.exists()) {
-      const adminData = adminSnapshot.val();
-      const adminId = Object.keys(adminData)[0];
-      const adminUser = adminData[adminId];
+  // Check admins by fetching all and filtering client-side
+  // Fix: Use Firebase v8 compat syntax.
+  const adminsSnapshot = await dbRef.child('admins').get();
+  if (adminsSnapshot.exists()) {
+    const adminsData = adminsSnapshot.val();
+    const adminId = Object.keys(adminsData).find(key => adminsData[key].email.toLowerCase() === normalizedEmail);
+    if (adminId) {
+      const adminUser = adminsData[adminId];
       return { id: adminId, name: adminUser.name, email: adminUser.email, role: Role.ADMIN };
+    }
   }
 
-  // Check employees
-  const employeeQuery = query(child(dbRef, 'employees'), orderByChild('email'), equalTo(normalizedEmail));
-  const employeeSnapshot = await get(employeeQuery);
-  if (employeeSnapshot.exists()) {
-      const employeeData = employeeSnapshot.val();
-      const employeeId = Object.keys(employeeData)[0];
-      const employeeUser = employeeData[employeeId];
+  // Check employees by fetching all and filtering client-side
+  // Fix: Use Firebase v8 compat syntax.
+  const employeesSnapshot = await dbRef.child('employees').get();
+  if (employeesSnapshot.exists()) {
+    const employeesData = employeesSnapshot.val();
+    const employeeId = Object.keys(employeesData).find(key => employeesData[key].email.toLowerCase() === normalizedEmail);
+    if (employeeId) {
+      const employeeUser = employeesData[employeeId];
       return { id: employeeId, name: employeeUser.name, email: employeeUser.email, role: Role.EMPLOYEE };
+    }
   }
 
   return null;
 };
 
 export const getEmployeesFromDB = async (): Promise<User[]> => {
-    const employeesRef = ref(db, 'employees');
-    const snapshot = await get(employeesRef);
+    // Fix: Use Firebase v8 compat syntax.
+    const employeesRef = db.ref('employees');
+    const snapshot = await employeesRef.get();
     if (snapshot.exists()) {
         const data = snapshot.val();
         return Object.keys(data).map(key => ({
@@ -66,15 +76,17 @@ export const getEmployeesFromDB = async (): Promise<User[]> => {
 };
 
 export const addEmployeeToDB = async (name: string, email: string): Promise<User> => {
-    const employeesRef = ref(db, 'employees');
-    const newEmployeeRef = push(employeesRef);
+    // Fix: Use Firebase v8 compat syntax.
+    const employeesRef = db.ref('employees');
+    const newEmployeeRef = employeesRef.push();
     const newEmployeeData = { name, email: email.toLowerCase() };
-    await set(newEmployeeRef, newEmployeeData);
+    await newEmployeeRef.set(newEmployeeData);
     return { id: newEmployeeRef.key!, ...newEmployeeData, role: Role.EMPLOYEE };
 };
 
 
 export const removeEmployeeFromDB = async (employeeId: string): Promise<void> => {
-    const employeeRef = ref(db, `employees/${employeeId}`);
-    await remove(employeeRef);
+    // Fix: Use Firebase v8 compat syntax.
+    const employeeRef = db.ref(`employees/${employeeId}`);
+    await employeeRef.remove();
 };
