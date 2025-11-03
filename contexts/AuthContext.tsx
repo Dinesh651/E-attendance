@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { auth, googleProvider } from '../services/firebase';
+import { auth, googleProvider, findUserByEmailInDB } from '../services/firebase';
 import { signInWithPopup, signOut, onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { api } from '../services/mockApi';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -25,12 +24,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       try {
         if (firebaseUser && firebaseUser.email) {
-          const appUser = await api.findUserByEmail(firebaseUser.email);
+          const appUser = await findUserByEmailInDB(firebaseUser.email);
           if (appUser) {
             setUser(appUser);
           } else {
-            // User authenticated with Google but is not in our mock user list
-            setError("Access denied. Your account is not authorized.");
+            setError("Your account is not authorized to access this application.");
             setUser(null);
             await signOut(auth);
           }
@@ -55,11 +53,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const result = await signInWithPopup(auth, googleProvider);
       const firebaseUser = result.user;
       if (firebaseUser && firebaseUser.email) {
-        const appUser = await api.findUserByEmail(firebaseUser.email);
+        const appUser = await findUserByEmailInDB(firebaseUser.email);
         if (appUser) {
           setUser(appUser);
         } else {
-          setError("Access denied. Your account is not authorized.");
+          setError("Your account is not authorized to access this application.");
           await signOut(auth);
         }
       } else {

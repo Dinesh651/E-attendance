@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/mockApi';
+import { getEmployeesFromDB, addEmployeeToDB, removeEmployeeFromDB } from '../services/firebase';
 import { User, Client, AttendanceRecord, Notice } from '../types';
 import { Spinner } from './icons';
 
@@ -11,22 +12,92 @@ const DashboardCard: React.FC<{ title: string; children: React.ReactNode }> = ({
     </div>
 );
 
-// Component to display a list of users
-const UserList: React.FC<{ users: User[] }> = ({ users }) => (
-    <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
-        {users.map(user => (
-            <li key={user.id} className="p-3 bg-gray-50 rounded-md flex justify-between items-center">
-                <div>
-                    <p className="font-semibold text-gray-900">{user.name}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                    {user.role}
-                </span>
-            </li>
-        ))}
-    </ul>
-);
+const UserManagement: React.FC<{ initialUsers: User[] }> = ({ initialUsers }) => {
+    const [users, setUsers] = useState<User[]>(initialUsers);
+    const [newName, setNewName] = useState('');
+    const [newEmail, setNewEmail] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleAddUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newName || !newEmail) {
+            setError('Name and email are required.');
+            return;
+        }
+        setError('');
+        setIsSubmitting(true);
+        try {
+            const newUser = await addEmployeeToDB(newName, newEmail);
+            setUsers(prev => [...prev, newUser]);
+            setNewName('');
+            setNewEmail('');
+        } catch (err) {
+            setError('Failed to add employee.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleRemoveUser = async (userId: string) => {
+        if(window.confirm('Are you sure you want to remove this employee?')) {
+            try {
+                await removeEmployeeFromDB(userId);
+                setUsers(prev => prev.filter(u => u.id !== userId));
+            } catch (err) {
+                setError('Failed to remove employee.');
+            }
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                {users.map(user => (
+                    <li key={user.id} className="p-3 bg-gray-50 rounded-md flex justify-between items-center">
+                        <div>
+                            <p className="font-semibold text-gray-900">{user.name}</p>
+                            <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                        <button 
+                            onClick={() => handleRemoveUser(user.id)}
+                            className="text-red-500 hover:text-red-700 font-semibold text-sm"
+                        >
+                            Remove
+                        </button>
+                    </li>
+                ))}
+            </ul>
+            <form onSubmit={handleAddUser} className="space-y-3 border-t pt-4">
+                <h3 className="text-md font-semibold text-gray-700">Add New Employee</h3>
+                 {error && <p className="text-red-500 text-sm">{error}</p>}
+                <input 
+                    type="text" 
+                    placeholder="Name" 
+                    value={newName}
+                    onChange={e => setNewName(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+                <input 
+                    type="email" 
+                    placeholder="Email" 
+                    value={newEmail}
+                    onChange={e => setNewEmail(e.target.value)}
+                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+                 <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 flex items-center justify-center transition-colors"
+                >
+                    {isSubmitting && <Spinner className="w-5 h-5 mr-2" />}
+                    Add Employee
+                </button>
+            </form>
+        </div>
+    );
+};
+
 
 // Component to display attendance records
 const AttendanceLog: React.FC<{ records: AttendanceRecord[] }> = ({ records }) => (
@@ -121,7 +192,6 @@ const NoticeForm: React.FC<{ onNoticeAdded: (notice: Notice) => void }> = ({ onN
 const AdminDashboard: React.FC = () => {
     const [data, setData] = useState<{
         users: User[];
-        clients: Client[];
         records: AttendanceRecord[];
         notices: Notice[];
     } | null>(null);
@@ -131,13 +201,13 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [users, clients, records, notices] = await Promise.all([
-                    api.getUsers(),
-                    api.getClients(),
+                // Fetch users from Firebase DB, other data from mock API
+                const [users, records, notices] = await Promise.all([
+                    getEmployeesFromDB(),
                     api.getAttendanceRecords(),
                     api.getNotices()
                 ]);
-                setData({ users, clients, records, notices });
+                setData({ users, records, notices });
             } catch (err) {
                 setError("Failed to fetch dashboard data.");
             } finally {
@@ -168,8 +238,8 @@ const AdminDashboard: React.FC = () => {
                 </DashboardCard>
             </div>
             <div className="lg:col-span-1 space-y-8">
-                <DashboardCard title="Manage Team">
-                    <UserList users={data.users} />
+                <DashboardCard title="Manage Employees">
+                   <UserManagement initialUsers={data.users} />
                 </DashboardCard>
                  <DashboardCard title="Post a New Notice">
                     <NoticeForm onNoticeAdded={handleNoticeAdded} />
