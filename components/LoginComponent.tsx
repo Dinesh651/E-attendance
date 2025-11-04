@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Spinner } from './icons';
+import { Spinner, UhyLogo } from './icons';
+import { Role } from '../types';
 
 const GoogleIcon = () => (
     <svg className="w-5 h-5 mr-3" viewBox="0 0 48 48">
@@ -18,13 +20,14 @@ const GoogleIcon = () => (
 
 
 const LoginComponent: React.FC = () => {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, previewLogin } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div className="flex flex-col items-center">
+            <UhyLogo className="w-56 mb-6" />
+          <h2 className="mt-2 text-center text-2xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -40,7 +43,7 @@ const LoginComponent: React.FC = () => {
               type="button"
               onClick={login}
               disabled={isLoading}
-              className="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed shadow"
+              className="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00843D] disabled:bg-gray-100 disabled:cursor-not-allowed shadow"
             >
               {isLoading ? (
                 <>
@@ -55,6 +58,36 @@ const LoginComponent: React.FC = () => {
               )}
             </button>
           </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 text-gray-500">
+                Or
+              </span>
+            </div>
+          </div>
+          
+          <div className="text-center text-sm">
+            <p className="text-gray-600">For preview purposes, you can enter as:</p>
+            <div className="flex justify-center space-x-6 mt-2">
+                <button
+                    onClick={() => previewLogin(Role.EMPLOYEE)}
+                    className="font-medium text-[#00843D] hover:text-[#006A4E] hover:underline"
+                >
+                    Article
+                </button>
+                <button
+                    onClick={() => previewLogin(Role.ADMIN)}
+                    className="font-medium text-[#00843D] hover:text-[#006A4E] hover:underline"
+                >
+                    Admin
+                </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

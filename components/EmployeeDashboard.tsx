@@ -25,7 +25,7 @@ const NoticeBoard: React.FC = () => {
     }, []);
 
     if (isLoading) {
-        return <div className="flex justify-center items-center p-8"><Spinner className="w-8 h-8 text-blue-600" /></div>;
+        return <div className="flex justify-center items-center p-8"><Spinner className="w-8 h-8 text-[#00843D]" /></div>;
     }
 
     return (
@@ -33,7 +33,7 @@ const NoticeBoard: React.FC = () => {
             <h2 className="text-xl font-bold text-gray-800 mb-4">Office Notices</h2>
             <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                 {notices.length > 0 ? notices.map(notice => (
-                    <div key={notice.id} className="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
+                    <div key={notice.id} className="p-4 border-l-4 border-[#00843D] bg-green-50 rounded-r-lg">
                         <h3 className="font-semibold text-gray-900">{notice.title}</h3>
                         <p className="text-sm text-gray-700 mt-1">{notice.content}</p>
                         <p className="text-xs text-gray-500 mt-2 text-right">{notice.createdAt.toLocaleDateString()}</p>
@@ -45,7 +45,7 @@ const NoticeBoard: React.FC = () => {
 };
 
 
-const EmployeeDashboard: React.FC = () => {
+const ArticleDashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-1">
@@ -58,4 +58,4 @@ const EmployeeDashboard: React.FC = () => {
   );
 };
 
-export default EmployeeDashboard;
+export default ArticleDashboard;

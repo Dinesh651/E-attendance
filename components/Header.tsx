@@ -1,7 +1,7 @@
 // Fix: Replaced placeholder content with Header component implementation.
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogoutIcon } from './icons';
+import { LogoutIcon, UhyLogo } from './icons';
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -10,9 +10,7 @@ const Header: React.FC = () => {
     <header className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-blue-600">
-            Audit Firm Dashboard
-          </h1>
+            <UhyLogo className="w-32" />
           {user && (
             <div className="flex items-center space-x-4">
               <span className="text-gray-700 hidden sm:block">Welcome, {user.name}</span>

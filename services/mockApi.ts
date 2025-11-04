@@ -1,29 +1,37 @@
+
 import { User, Client, AttendanceRecord, Notice, Role, Location } from '../types';
 
 // --- MOCK DATABASE ---
 
 const users: User[] = [
   { id: '1', name: 'Admin User', email: 'admin@auditfirm.com', role: Role.ADMIN },
-  { id: '2', name: 'Alice Johnson', email: 'alice@auditfirm.com', role: Role.EMPLOYEE },
+  { id: '2', name: 'Keto', email: 'keto@auditfirm.com', role: Role.EMPLOYEE },
   { id: '3', name: 'Bob Williams', email: 'bob@auditfirm.com', role: Role.EMPLOYEE },
 ];
 
 const clients: Client[] = [
-  { id: 'c1', name: 'Innovate Corp', address: '123 Tech Avenue' },
-  { id: 'c2', name: 'Global Solutions Ltd.', address: '456 Business Blvd' },
-  { id: 'c3', name: 'Quantum Industries', address: '789 Enterprise Way' },
+  { id: 'c1', name: 'Advance group', address: 'Client Address' },
+  { id: 'c2', name: 'Radission Hotel', address: 'Client Address' },
+  { id: 'c3', name: 'Bhatta & Co', address: 'Client Address' },
+  { id: 'c4', name: 'Henan', address: 'Client Address' },
+  { id: 'c5', name: 'Avani', address: 'Client Address' },
+  { id: 'c6', name: 'Swiss Silver', address: 'Client Address' },
+  { id: 'c7', name: 'RBCL', address: 'Client Address' },
+  { id: 'c8', name: 'Office', address: 'Client Address' },
+  { id: 'c9', name: 'Outstation', address: 'Client Address' },
+  { id: 'c10', name: 'Others', address: 'Client Address' },
 ];
 
 let attendanceRecords: AttendanceRecord[] = [
     { 
         id: 'a1', 
         userId: '2', 
-        userName: 'Alice Johnson',
+        userName: 'Keto',
         checkInTime: new Date(new Date().setDate(new Date().getDate() - 1)), 
         checkOutTime: new Date(new Date(new Date().setDate(new Date().getDate() - 1)).setHours(17)),
         location: { lat: 34.0522, lng: -118.2437 },
         clientId: 'c1',
-        clientName: 'Innovate Corp'
+        clientName: 'Advance group'
     }
 ];
 
@@ -79,12 +87,11 @@ export const api = {
     return attendanceRecords.find(a => a.userId === userId && !a.checkOutTime);
   },
 
-  checkIn: async (userId: string, clientId: string, location: Location): Promise<AttendanceRecord> => {
+  checkIn: async (userId: string, userName: string, clientId: string, location: Location): Promise<AttendanceRecord> => {
     await delay(1000);
-    const user = users.find(u => u.id === userId);
     const client = clients.find(c => c.id === clientId);
-    if (!user || !client) {
-      throw new Error('User or Client not found');
+    if (!client) {
+      throw new Error('Client not found');
     }
 
     const existing = await api.getCurrentAttendance(userId);
@@ -95,7 +102,7 @@ export const api = {
     const newRecord: AttendanceRecord = {
       id: `a${attendanceRecords.length + 1}`,
       userId,
-      userName: user.name,
+      userName: userName,
       clientId,
       clientName: client.name,
       checkInTime: new Date(),

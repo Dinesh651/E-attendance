@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/mockApi';
 import { getEmployeesFromDB, addEmployeeToDB, removeEmployeeFromDB } from '../services/firebase';
@@ -33,19 +34,19 @@ const UserManagement: React.FC<{ initialUsers: User[] }> = ({ initialUsers }) =>
             setNewName('');
             setNewEmail('');
         } catch (err) {
-            setError('Failed to add employee.');
+            setError('Failed to add article.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleRemoveUser = async (userId: string) => {
-        if(window.confirm('Are you sure you want to remove this employee?')) {
+        if(window.confirm('Are you sure you want to remove this article?')) {
             try {
                 await removeEmployeeFromDB(userId);
                 setUsers(prev => prev.filter(u => u.id !== userId));
             } catch (err) {
-                setError('Failed to remove employee.');
+                setError('Failed to remove article.');
             }
         }
     };
@@ -69,29 +70,29 @@ const UserManagement: React.FC<{ initialUsers: User[] }> = ({ initialUsers }) =>
                 ))}
             </ul>
             <form onSubmit={handleAddUser} className="space-y-3 border-t pt-4">
-                <h3 className="text-md font-semibold text-gray-700">Add New Employee</h3>
+                <h3 className="text-md font-semibold text-gray-700">Add New Article</h3>
                  {error && <p className="text-red-500 text-sm">{error}</p>}
                 <input 
                     type="text" 
                     placeholder="Name" 
                     value={newName}
                     onChange={e => setNewName(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#00843D] focus:border-[#00843D] sm:text-sm"
                 />
                 <input 
                     type="email" 
                     placeholder="Email" 
                     value={newEmail}
                     onChange={e => setNewEmail(e.target.value)}
-                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#00843D] focus:border-[#00843D] sm:text-sm"
                 />
                  <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 flex items-center justify-center transition-colors"
+                    className="w-full bg-[#00843D] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#006A4E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00843D] disabled:bg-green-300 flex items-center justify-center transition-colors"
                 >
                     {isSubmitting && <Spinner className="w-5 h-5 mr-2" />}
-                    Add Employee
+                    Add Article
                 </button>
             </form>
         </div>
@@ -105,7 +106,7 @@ const AttendanceLog: React.FC<{ records: AttendanceRecord[] }> = ({ records }) =
         <table className="w-full text-sm text-left text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
                 <tr>
-                    <th scope="col" className="py-3 px-6">Employee</th>
+                    <th scope="col" className="py-3 px-6">Article</th>
                     <th scope="col" className="py-3 px-6">Client</th>
                     <th scope="col" className="py-3 px-6">Check In</th>
                     <th scope="col" className="py-3 px-6">Check Out</th>
@@ -162,7 +163,7 @@ const NoticeForm: React.FC<{ onNoticeAdded: (notice: Notice) => void }> = ({ onN
                     id="notice-title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#00843D] focus:border-[#00843D] sm:text-sm"
                     disabled={isSubmitting}
                 />
             </div>
@@ -173,14 +174,14 @@ const NoticeForm: React.FC<{ onNoticeAdded: (notice: Notice) => void }> = ({ onN
                     rows={3}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#00843D] focus:border-[#00843D] sm:text-sm"
                     disabled={isSubmitting}
                 />
             </div>
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 flex items-center justify-center transition-colors"
+                className="w-full bg-[#00843D] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#006A4E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00843D] disabled:bg-green-300 flex items-center justify-center transition-colors"
             >
                 {isSubmitting && <Spinner className="w-5 h-5 mr-2" />}
                 Post Notice
@@ -223,7 +224,7 @@ const AdminDashboard: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className="flex justify-center items-center p-8"><Spinner className="w-12 h-12 text-blue-600" /></div>;
+        return <div className="flex justify-center items-center p-8"><Spinner className="w-12 h-12 text-[#00843D]" /></div>;
     }
 
     if (error || !data) {
@@ -238,7 +239,7 @@ const AdminDashboard: React.FC = () => {
                 </DashboardCard>
             </div>
             <div className="lg:col-span-1 space-y-8">
-                <DashboardCard title="Manage Employees">
+                <DashboardCard title="Manage Articles">
                    <UserManagement initialUsers={data.users} />
                 </DashboardCard>
                  <DashboardCard title="Post a New Notice">

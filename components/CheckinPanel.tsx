@@ -53,7 +53,7 @@ const CheckinPanel: React.FC = () => {
             lng: position.coords.longitude,
           };
           if (user) {
-            const newRecord = await api.checkIn(user.id, selectedClient, location);
+            const newRecord = await api.checkIn(user.id, user.name, selectedClient, location);
             setCurrentAttendance(newRecord);
           }
         } catch (err) {
@@ -86,7 +86,7 @@ const CheckinPanel: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center p-8 bg-white rounded-lg shadow-md"><Spinner className="w-8 h-8 text-blue-600" /></div>;
+    return <div className="flex justify-center items-center p-8 bg-white rounded-lg shadow-md"><Spinner className="w-8 h-8 text-[#00843D]" /></div>;
   }
 
   return (
@@ -132,7 +132,7 @@ const CheckinPanel: React.FC = () => {
               id="client-select"
               value={selectedClient}
               onChange={(e) => setSelectedClient(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#00843D] focus:border-[#00843D] sm:text-sm rounded-md"
             >
               {clients.map(client => (
                 <option key={client.id} value={client.id}>{client.name}</option>
@@ -142,7 +142,7 @@ const CheckinPanel: React.FC = () => {
           <button
             onClick={handleCheckIn}
             disabled={isActionLoading || !selectedClient}
-            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 flex items-center justify-center transition-colors"
+            className="w-full bg-[#00843D] text-white font-bold py-3 px-4 rounded-lg hover:bg-[#006A4E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00843D] disabled:bg-green-300 flex items-center justify-center transition-colors"
           >
             {isActionLoading && <Spinner className="w-5 h-5 mr-2" />}
             Check In

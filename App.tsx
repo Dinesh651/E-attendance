@@ -1,11 +1,13 @@
+
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginComponent from './components/LoginComponent';
 import AdminDashboard from './components/AdminDashboard';
-import EmployeeDashboard from './components/EmployeeDashboard';
+import ArticleDashboard from './components/EmployeeDashboard';
 import Header from './components/Header';
 import { Role } from './types';
 import { Spinner } from './components/icons';
+import Footer from './components/Footer';
 
 const AppContent: React.FC = () => {
     const { user, isInitializing } = useAuth();
@@ -13,7 +15,7 @@ const AppContent: React.FC = () => {
     if (isInitializing) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <Spinner className="w-12 h-12 text-blue-600" />
+                <Spinner className="w-12 h-12 text-[#00843D]" />
             </div>
         );
     }
@@ -25,8 +27,8 @@ const AppContent: React.FC = () => {
     return (
         <div className="bg-gray-100 min-h-screen">
             <Header />
-            <main className="py-8 px-4 sm:px-6 lg:px-8">
-                {user.role === Role.ADMIN ? <AdminDashboard /> : <EmployeeDashboard />}
+            <main className="py-8 px-4 sm:px-6 lg:px-8 pb-16">
+                {user.role === Role.ADMIN ? <AdminDashboard /> : <ArticleDashboard />}
             </main>
         </div>
     );
@@ -37,6 +39,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <AppContent />
+      <Footer />
     </AuthProvider>
   );
 };
